@@ -9,6 +9,7 @@ export default function ExpenseForm({
   categories,
   today,
   accounts,
+  currentPerson,
 }) {
   function updateField(field, value) {
     setForm((previousForm) => ({
@@ -23,7 +24,7 @@ export default function ExpenseForm({
     setForm({
       merchant: '',
       amount: '',
-      person: 'Nelson',
+      person: currentPerson,
       payment: 'Débit',
       account: '',
       category: 'Logement',

@@ -71,10 +71,15 @@ export default function App() {
   const [editingId, setEditingId] = useState(null)
   const [editingIncomeId, setEditingIncomeId] = useState(null)
 
+  const currentPerson =
+    session?.user?.email?.toLowerCase() === 'nsjamt@gmail.com'
+      ? 'Sofia'
+      : 'Nelson'
+
   const [incomeForm, setIncomeForm] = useState({
     source: '',
     amount: '',
-    person: 'Nelson',
+    person: currentPerson,
     account: '',
     category: 'Salaire',
     date: today(),
@@ -84,7 +89,7 @@ export default function App() {
   const [form, setForm] = useState({
     merchant: '',
     amount: '',
-    person: 'Nelson',
+    person: currentPerson,
     payment: 'Débit',
     account: '',
     category: 'Logement',
@@ -116,6 +121,20 @@ export default function App() {
     loadAccounts()
     loadBudget()
   }, [session, month])
+
+  useEffect(() => {
+    if (!session) return
+
+    setIncomeForm((previousForm) => ({
+      ...previousForm,
+      person: currentPerson,
+    }))
+
+    setForm((previousForm) => ({
+      ...previousForm,
+      person: currentPerson,
+    }))
+  }, [session, currentPerson])
 
   function changeMonth(offset) {
     const [year, monthNumber] = month.split('-').map(Number)
@@ -271,7 +290,7 @@ export default function App() {
     setIncomeForm({
       source: '',
       amount: '',
-      person: 'Nelson',
+      person: currentPerson,
       account: '',
       category: 'Salaire',
       date: today(),
@@ -299,7 +318,7 @@ export default function App() {
       setIncomeForm({
         source: '',
         amount: '',
-        person: 'Nelson',
+        person: currentPerson,
         account: '',
         category: 'Salaire',
         date: today(),
@@ -388,7 +407,7 @@ export default function App() {
     setForm({
       merchant: '',
       amount: '',
-      person: 'Nelson',
+      person: currentPerson,
       payment: 'Débit',
       account: '',
       category: 'Logement',
@@ -487,12 +506,12 @@ export default function App() {
             sécurisé.
           </p>
 
-<input
-  type="email"
-  placeholder="nom@courriel.com"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-/>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="nom@courriel.com"
+          />
 
           <button onClick={signIn}>Recevoir le lien</button>
           <p className="message">{message}</p>
@@ -578,6 +597,7 @@ export default function App() {
           setEditingIncomeId={setEditingIncomeId}
           today={today}
           accounts={accounts}
+          currentPerson={currentPerson}
         />
 
         <section className="card income-history-card">
@@ -642,7 +662,7 @@ export default function App() {
                             setIncomeForm({
                               source: incomeItem.source || '',
                               amount: incomeItem.amount || '',
-                              person: incomeItem.person || 'Nelson',
+                              person: incomeItem.person || currentPerson,
                               account: incomeItem.account_id || '',
                               category: incomeItem.category || 'Salaire',
                               date: incomeItem.income_date || today(),
@@ -685,6 +705,7 @@ export default function App() {
             categories={categories}
             today={today}
             accounts={accounts}
+            currentPerson={currentPerson}
           />
 
           <article className="card distribution-card">

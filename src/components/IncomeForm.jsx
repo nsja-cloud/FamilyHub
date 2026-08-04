@@ -6,6 +6,7 @@ export default function IncomeForm({
   setEditingIncomeId,
   today,
   accounts,
+  currentPerson,
 }) {
   function updateField(field, value) {
     setIncomeForm((previousForm) => ({
@@ -20,7 +21,7 @@ export default function IncomeForm({
     setIncomeForm({
       source: '',
       amount: '',
-      person: 'Nelson',
+      person: currentPerson,
       account: '',
       category: 'Salaire',
       date: today(),
