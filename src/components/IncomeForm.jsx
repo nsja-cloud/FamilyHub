@@ -1,22 +1,55 @@
 export default function IncomeForm({
   incomeForm,
   setIncomeForm,
-  addIncome
+  addIncome,
+  editingIncomeId,
+  setEditingIncomeId,
+  today,
+  accounts,
 }) {
-  return (
-    <section className="card">
-      <h2>💰 Revenus</h2>
+  function updateField(field, value) {
+    setIncomeForm((previousForm) => ({
+      ...previousForm,
+      [field]: value,
+    }))
+  }
 
-      <div className="form-grid">
+  function cancelEditing() {
+    setEditingIncomeId(null)
+
+    setIncomeForm({
+      source: '',
+      amount: '',
+      person: 'Nelson',
+      account: '',
+      category: 'Salaire',
+      date: today(),
+      description: '',
+    })
+  }
+
+  return (
+    <section className="card income-form-card">
+      <div className="form-heading">
+        <div>
+          <p className="section-kicker">
+            {editingIncomeId ? 'Modification' : 'Nouveau'}
+          </p>
+
+          <h2>
+            💰 {editingIncomeId ? 'Modifier le revenu' : 'Ajouter un revenu'}
+          </h2>
+        </div>
+      </div>
+
+      <div className="income-form-grid">
         <label>
           Source
           <input
+            type="text"
             value={incomeForm.source}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                source: e.target.value
-              })
+            onChange={(event) =>
+              updateField('source', event.target.value)
             }
           />
         </label>
@@ -25,13 +58,13 @@ export default function IncomeForm({
           Montant
           <input
             type="number"
+            min="0"
+            step="0.01"
             value={incomeForm.amount}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                amount: e.target.value
-              })
+            onChange={(event) =>
+              updateField('amount', event.target.value)
             }
+            placeholder="0,00"
           />
         </label>
 
@@ -39,15 +72,30 @@ export default function IncomeForm({
           Personne
           <select
             value={incomeForm.person}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                person: e.target.value
-              })
+            onChange={(event) =>
+              updateField('person', event.target.value)
             }
           >
-            <option>Nelson</option>
-            <option>Sofia</option>
+            <option value="Nelson">Nelson</option>
+            <option value="Sofia">Sofia</option>
+          </select>
+        </label>
+
+        <label>
+          Compte de destination
+          <select
+            value={incomeForm.account}
+            onChange={(event) =>
+              updateField('account', event.target.value)
+            }
+          >
+            <option value="">Sélectionner un compte</option>
+
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.name}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -55,17 +103,15 @@ export default function IncomeForm({
           Catégorie
           <select
             value={incomeForm.category}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                category: e.target.value
-              })
+            onChange={(event) =>
+              updateField('category', event.target.value)
             }
           >
-            <option>Salaire</option>
-            <option>Prime</option>
-            <option>Remboursement</option>
-            <option>Autre</option>
+            <option value="Salaire">Salaire</option>
+            <option value="Entreprise">Entreprise</option>
+            <option value="Allocation">Allocation</option>
+            <option value="Remboursement">Remboursement</option>
+            <option value="Autre">Autre</option>
           </select>
         </label>
 
@@ -74,32 +120,42 @@ export default function IncomeForm({
           <input
             type="date"
             value={incomeForm.date}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                date: e.target.value
-              })
+            onChange={(event) =>
+              updateField('date', event.target.value)
             }
           />
         </label>
 
-        <label className="wide">
+        <label>
           Description
           <input
+            type="text"
             value={incomeForm.description}
-            onChange={e =>
-              setIncomeForm({
-                ...incomeForm,
-                description: e.target.value
-              })
+            onChange={(event) =>
+              updateField('description', event.target.value)
             }
+            placeholder="Description facultative"
           />
         </label>
       </div>
 
-      <button onClick={addIncome}>
-        Ajouter un revenu
-      </button>
+      <div className="form-actions">
+        <button type="button" onClick={addIncome}>
+          {editingIncomeId
+            ? 'Enregistrer les modifications'
+            : 'Ajouter un revenu'}
+        </button>
+
+        {editingIncomeId && (
+          <button
+            type="button"
+            className="secondary"
+            onClick={cancelEditing}
+          >
+            Annuler
+          </button>
+        )}
+      </div>
     </section>
   )
 }

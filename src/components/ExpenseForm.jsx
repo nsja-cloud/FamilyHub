@@ -7,19 +7,60 @@ export default function ExpenseForm({
   setMessage,
   updateMerchant,
   categories,
-  today
+  today,
+  accounts,
 }) {
+  function updateField(field, value) {
+    setForm((previousForm) => ({
+      ...previousForm,
+      [field]: value,
+    }))
+  }
+
+  function cancelEditing() {
+    setEditingId(null)
+
+    setForm({
+      merchant: '',
+      amount: '',
+      person: 'Nelson',
+      payment: 'Débit',
+      account: '',
+      category: 'Logement',
+      date: today(),
+      description: '',
+    })
+
+    setMessage('Modification annulée.')
+  }
+
   return (
-    <article className="card">
-      <h2>Ajouter une dépense</h2>
+    <article className="card expense-form-card">
+      <div className="form-heading">
+        <div>
+          <p className="section-kicker">
+            {editingId ? 'Modification' : 'Nouvelle'}
+          </p>
 
-      <div className="form-grid">
+          <h2>
+            💸 {editingId ? 'Modifier la dépense' : 'Ajouter une dépense'}
+          </h2>
 
+          <p className="section-description">
+            Entre les détails de la transaction et le compte utilisé.
+          </p>
+        </div>
+      </div>
+
+      <div className="expense-form-grid">
         <label>
           Marchand
           <input
+            type="text"
             value={form.merchant}
-            onChange={(e) => updateMerchant(e.target.value)}
+            onChange={(event) =>
+              updateMerchant(event.target.value)
+            }
           />
         </label>
 
@@ -27,11 +68,13 @@ export default function ExpenseForm({
           Montant
           <input
             type="number"
+            min="0"
             step="0.01"
             value={form.amount}
-            onChange={(e) =>
-              setForm({ ...form, amount: e.target.value })
+            onChange={(event) =>
+              updateField('amount', event.target.value)
             }
+            placeholder="0,00"
           />
         </label>
 
@@ -39,26 +82,30 @@ export default function ExpenseForm({
           Personne
           <select
             value={form.person}
-            onChange={(e) =>
-              setForm({ ...form, person: e.target.value })
+            onChange={(event) =>
+              updateField('person', event.target.value)
             }
           >
-            <option>Nelson</option>
-            <option>Sofia</option>
+            <option value="Nelson">Nelson</option>
+            <option value="Sofia">Sofia</option>
           </select>
         </label>
 
         <label>
-          Paiement
+          Compte utilisé
           <select
-            value={form.payment}
-            onChange={(e) =>
-              setForm({ ...form, payment: e.target.value })
+            value={form.account}
+            onChange={(event) =>
+              updateField('account', event.target.value)
             }
           >
-            <option>Débit</option>
-            <option>Crédit</option>
-            <option>Comptant</option>
+            <option value="">Sélectionner un compte</option>
+
+            {accounts.map((account) => (
+              <option key={account.id} value={account.name}>
+                {account.name}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -66,12 +113,14 @@ export default function ExpenseForm({
           Catégorie
           <select
             value={form.category}
-            onChange={(e) =>
-              setForm({ ...form, category: e.target.value })
+            onChange={(event) =>
+              updateField('category', event.target.value)
             }
           >
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </label>
@@ -81,58 +130,42 @@ export default function ExpenseForm({
           <input
             type="date"
             value={form.date}
-            onChange={(e) =>
-              setForm({ ...form, date: e.target.value })
+            onChange={(event) =>
+              updateField('date', event.target.value)
             }
           />
         </label>
 
-        <label className="wide">
+        <label className="expense-description">
           Description
           <input
+            type="text"
             value={form.description}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                description: e.target.value
-              })
+            onChange={(event) =>
+              updateField('description', event.target.value)
             }
+            placeholder="Description facultative"
           />
         </label>
-
       </div>
 
-      <div style={{ display: "flex", gap: "10px" }}>
-        <button onClick={addExpense}>
+      <div className="form-actions">
+        <button type="button" onClick={addExpense}>
           {editingId
-            ? "Enregistrer les modifications"
-            : "Ajouter"}
+            ? 'Enregistrer les modifications'
+            : 'Ajouter la dépense'}
         </button>
 
         {editingId && (
           <button
+            type="button"
             className="secondary"
-            onClick={() => {
-              setEditingId(null)
-
-              setForm({
-                merchant: "",
-                amount: "",
-                person: "Nelson",
-                payment: "Débit",
-                category: "Logement",
-                date: today(),
-                description: ""
-              })
-
-              setMessage("Modification annulée.")
-            }}
+            onClick={cancelEditing}
           >
             Annuler
           </button>
         )}
       </div>
-
     </article>
   )
 }
