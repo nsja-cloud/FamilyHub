@@ -102,7 +102,7 @@ export default function ExpenseForm({
             <option value="">Sélectionner un compte</option>
 
             {accounts.map((account) => (
-              <option key={account.id} value={account.name}>
+              <option key={account.id} value={account.id}>
                 {account.name}
               </option>
             ))}
