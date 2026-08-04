@@ -488,11 +488,10 @@ export default function App() {
           </p>
 
 <input
-  type="text"
-  value={incomeForm.source}
-  onChange={(event) =>
-    updateField('source', event.target.value)
-  }
+  type="email"
+  placeholder="nom@courriel.com"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
 />
 
           <button onClick={signIn}>Recevoir le lien</button>
