@@ -136,6 +136,31 @@ export default function App() {
     }))
   }, [session, currentPerson])
 
+  async function updateOpeningBalance(accountId, newOpeningBalance) {
+    const openingBalance = Number(newOpeningBalance)
+
+    if (!Number.isFinite(openingBalance)) {
+      setMessage('Entre un solde de départ valide.')
+      return false
+    }
+
+    const { error } = await supabase
+      .from('accounts')
+      .update({
+        opening_balance: openingBalance,
+      })
+      .eq('id', accountId)
+
+    if (error) {
+      setMessage(error.message)
+      return false
+    }
+
+    await loadAccounts()
+    setMessage('Solde de départ modifié.')
+    return true
+  }
+
   function changeMonth(offset) {
     const [year, monthNumber] = month.split('-').map(Number)
     const nextDate = new Date(year, monthNumber - 1 + offset, 1)
@@ -587,7 +612,10 @@ export default function App() {
           />
         </section>
 
-        <Accounts accounts={accounts} />
+        <Accounts
+          accounts={accounts}
+          updateOpeningBalance={updateOpeningBalance}
+        />
 
         <IncomeForm
           incomeForm={incomeForm}

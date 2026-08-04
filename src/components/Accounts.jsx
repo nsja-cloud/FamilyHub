@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const money = new Intl.NumberFormat('fr-CA', {
   style: 'currency',
   currency: 'CAD',
@@ -37,7 +39,14 @@ function getBalanceClass(balance) {
   return 'account-balance account-balance--neutral'
 }
 
-export default function Accounts({ accounts = [] }) {
+export default function Accounts({
+  accounts = [],
+  updateOpeningBalance,
+}) {
+  const [editingAccountId, setEditingAccountId] = useState(null)
+  const [openingBalanceValue, setOpeningBalanceValue] = useState('')
+  const [saving, setSaving] = useState(false)
+
   const assets = accounts
     .filter((account) => Number(account.current_balance ?? 0) > 0)
     .reduce(
@@ -54,6 +63,35 @@ export default function Accounts({ accounts = [] }) {
     )
 
   const netBalance = assets - liabilities
+
+  function startEditing(account) {
+    setEditingAccountId(account.id)
+    setOpeningBalanceValue(
+      String(Number(account.opening_balance ?? 0)),
+    )
+  }
+
+  function cancelEditing() {
+    setEditingAccountId(null)
+    setOpeningBalanceValue('')
+  }
+
+  async function saveOpeningBalance(accountId) {
+    if (!updateOpeningBalance) return
+
+    setSaving(true)
+
+    const success = await updateOpeningBalance(
+      accountId,
+      openingBalanceValue,
+    )
+
+    setSaving(false)
+
+    if (success) {
+      cancelEditing()
+    }
+  }
 
   return (
     <section className="card accounts-card">
@@ -108,6 +146,10 @@ export default function Accounts({ accounts = [] }) {
         <div className="accounts-list">
           {accounts.map((account) => {
             const balance = Number(account.current_balance ?? 0)
+            const openingBalance = Number(
+              account.opening_balance ?? 0,
+            )
+            const isEditing = editingAccountId === account.id
 
             return (
               <article className="account-row" key={account.id}>
@@ -124,6 +166,10 @@ export default function Accounts({ accounts = [] }) {
                     <span className="account-type">
                       {getAccountType(account)}
                     </span>
+
+                    <span className="account-type">
+                      Solde de départ : {money.format(openingBalance)}
+                    </span>
                   </div>
                 </div>
 
@@ -135,6 +181,45 @@ export default function Accounts({ accounts = [] }) {
                   <strong className={getBalanceClass(balance)}>
                     {money.format(balance)}
                   </strong>
+
+                  {isEditing ? (
+                    <div className="form-actions">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={openingBalanceValue}
+                        onChange={(event) =>
+                          setOpeningBalanceValue(event.target.value)
+                        }
+                        aria-label={`Nouveau solde de départ pour ${account.name}`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => saveOpeningBalance(account.id)}
+                        disabled={saving}
+                      >
+                        {saving ? 'Enregistrement...' : 'Enregistrer'}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="secondary"
+                        onClick={cancelEditing}
+                        disabled={saving}
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() => startEditing(account)}
+                    >
+                      Modifier le solde de départ
+                    </button>
+                  )}
                 </div>
               </article>
             )
