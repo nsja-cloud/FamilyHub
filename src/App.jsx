@@ -3,6 +3,9 @@ import Metric from './components/Metric'
 import IncomeForm from './components/IncomeForm'
 import ExpenseForm from './components/ExpenseForm'
 import Accounts from './components/Accounts'
+import Layout from './components/Layout'
+import BillsPage from './pages/BillsPage'
+import { Navigate, Route, Routes } from 'react-router'
 import { supabase } from './supabase'
 
 const categories = [
@@ -546,7 +549,12 @@ export default function App() {
   }
 
   return (
-    <>
+    <Layout>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
       <header className="topbar">
         <div>
           <h1>FamilyHub</h1>
@@ -883,7 +891,14 @@ export default function App() {
 
         {message && <p className="message">{message}</p>}
       </main>
-    </>
+            </>
+          }
+        />
+
+        <Route path="/bills" element={<BillsPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   )
 }
 
